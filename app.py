@@ -68,13 +68,47 @@ class Barber:
         self._lname=lname
 
     def get_appointments(self):
-        pass
+        query=f"""
+                select * from appointments where barber_id=={self.id};
+                """
+        conn=sqlite3.connect(DATABASE_URL)
+        cursor=conn.cursor()
+        results=cursor.execute(query).fetchall()
+        print(results)
+        appointments=[]
+        for result in results:
+            appointment=Appointment(result[1],result[2],result[3],result[4],result[5],result[0])
+            appointments.append(appointment)
+        return appointments
+
 
     def get_clients_by_hair_cut(self,cut_style):
-        pass
+        query=f"""
+                select distinct clients.id,clients.fname,clients.lname,clients.phone,clients.email from clients inner join appointments on clients.id==appointments.client_id and appointments.cut_style==? and appointments.barber_id=={self.id};
+            """
+        conn=sqlite3.connect(DATABASE_URL)
+        cursor=conn.cursor()
+        results=cursor.execute(query,(cut_style,)).fetchall()
+        clients=[]
+        for result in results:
+            client=Client(result[1],result[2],result[3],result[4],result[0])
+            clients.append(client)
+        return clients
+
     
     def get_appointments_by_date(self,date):
-        pass
+        query=f"""
+                select * from appointments where appointments.date==? and appointments.barber_id=={self.id};
+                """
+        conn=sqlite3.connect(DATABASE_URL)
+        cursor=conn.cursor()
+        results=cursor.execute(query,(date,)).fetchall()
+        appointments=[]
+        for result in results:
+            appointment=Appointment(result[1],result[2],result[3],result[4],result[5],result[0])
+            appointments.append(appointment)
+        return appointments
+
 
     def __repr__(self):
         return f"<{type(self).__name__} id={self.id} first name={self.fname} last name={self.lname} date hired={self.date_hired} phone={self.phone} />"
@@ -105,11 +139,12 @@ class Client:
         cursor=conn.cursor()
         cursor.execute(query)
 
-    def __init__(self,fname,lname,phone,email):
+    def __init__(self,fname,lname,phone,email,id=None):
         self.fname=fname
         self.lname=lname
         self.phone=phone
         self.email=email
+        self.id=id
         self.all.append(self)
 
     def save(self):
@@ -124,7 +159,40 @@ class Client:
         self.id=result.lastrowid
 
     def book_appointment(self,barber,date,cut_style,price):
-        pass
+        Appointment.create_table()
+        query="""
+                Insert into appointments(client_id,barber_id,date,cut_style,price) values(?,?,?,?,?);
+                """
+        conn=sqlite3.connect(DATABASE_URL)
+        cursor=conn.cursor()
+        cursor.execute(query,(self.id,barber.id,date,cut_style,price))
+        conn.commit()
+
+    def get_appointments(self):
+        query=f"""
+                select * from appointments where appointments.client_id=={self.id};
+            """
+        conn=sqlite3.connect(DATABASE_URL)
+        cursor=conn.cursor()
+        results=cursor.execute(query).fetchall()
+        appointments=[]
+        for result in results:
+            appointment=Appointment(result[1],result[2],result[3],result[4],result[5],result[0])
+            appointments.append(appointment)
+        return appointments
+    
+    def get_barbers(self):
+        query=f"""
+                select distinct barbers.id,barbers.fname,barbers.lname,barbers.date_hired,barbers.phone from barbers inner join appointments on barbers.id==appointments.barber_id and appointments.client_id=={self.id};
+             """
+        conn=sqlite3.connect(DATABASE_URL)
+        cursor=conn.cursor()
+        results=cursor.execute(query).fetchall()
+        barbers=[]
+        for result in results:
+            barber=Barber(result[1],result[2],result[3],result[4],result[0])
+            barbers.append(barber)
+        return barbers
 
     @classmethod
     def get_client_by_id(cls,id):
@@ -162,13 +230,46 @@ class Appointment:
         cursor=conn.cursor()
         cursor.execute(query)
     
-    def __init__(self,client_id,barber_id,date,cut_style,price):
+    def __init__(self,client_id,barber_id,date,cut_style,price,id=None):
         self.client_id=client_id
         self.barber_id=barber_id
         self.date=date
         self.cut_style=cut_style
         self.price=price
+        self.id=id
         self.all.append(self)
+
+    @classmethod
+    def get_barbers_with_appointments(cls):
+        query="""
+                select distinct barbers.id,barbers.fname,barbers.lname,barbers.date_hired,barbers.phone from barbers inner join appointments where barbers.id==appointments.barber_id;
+                """
+        conn=sqlite3.connect(DATABASE_URL)
+        cursor=conn.cursor()
+        results=cursor.execute(query).fetchall()
+        print(results)
+        barbers=[]
+        for result in results:
+            barber=Barber(result[1],result[2],result[3],result[4],result[0])
+            barbers.append(barber)
+        return barbers
+    
+    @classmethod
+    def get_clients_with_appointments(cls):
+        query="""
+                select distinct clients.id,clients.fname,clients.lname,clients.phone,clients.email from clients inner join appointments where clients.id==appointments.client_id;
+                """
+        conn=sqlite3.connect(DATABASE_URL)
+        cursor=conn.cursor()
+        results=cursor.execute(query).fetchall()
+        print(results)
+        clients=[]
+        for result in results:
+            client=Client(result[1],result[2],result[3],result[4],result[0])
+            clients.append(client)
+        return clients
+
+
 
     def __repr__(self):
         return f"<{type(self).__name__} id={self.id} client id={self.client_id} barber id={self.barber_id} date={self.date} cut style={self.cut_style} price={self.price}  />"
@@ -177,22 +278,23 @@ class Appointment:
 Barber.drop_table()
 manuel=Barber("Manuel","Garcia","07-12-2023","779-343-3434")
 manuel.save()
-print(manuel)
-
-print()
+mike=Barber("Mike","Garcia","07-12-2023","779-343-3434")
+mike.save()
 
 Client.drop_table()
 bob=Client("Bob","Miller","343-343-3434","millerb@gmail.com")
 bob.save()
-print(bob)
 steve=Client("Steve","Smith","993-333-4343","smiths@gmail.com")
 steve.save()
-print(steve)
 
-# bob.book_appointment(manuel,"07-25-2023","spike",20)
-# bob.book_appointment(manuel,"07-30-2023","regular",7)
-# steve.book_appointment(manuel,"07-30-2023","spike",20)
+Appointment.drop_table()
+bob.book_appointment(manuel,"07-25-2023","spike",20)
+bob.book_appointment(manuel,"07-30-2023","spike",7)
+steve.book_appointment(steve,"07-30-2023","spike",20)
 
+print(Appointment.get_barbers_with_appointments())
+print()
+print(Appointment.get_clients_with_appointments())
 # print(manuel.get_clients_by_hair_cut("spike"))
 # print()
 # print(manuel.get_appointments_by_date("07-30-2023"))
