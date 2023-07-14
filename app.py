@@ -43,6 +43,12 @@ class Barber:
     def get_appointments_by_date(self,date):
         return [appointment for appointment in self.get_appointments() if date==appointment.date]
 
+    @classmethod
+    def get_barber_by_id(cls,id):
+        for barber in cls.all:
+            if(barber.id==id):
+                return barber
+    
     def __repr__(self):
         return f"<{type(self).__name__} id={self.id} first name={self.fname} last name={self.lname} date hired={self.date_hired} phone={self.phone} />"
 
@@ -60,6 +66,17 @@ class Client:
 
     def book_appointment(self,barber,date,cut_style,price):
         Appointment(self.id,barber.id,date,cut_style,price)
+
+    def get_appointments(self):
+        return [appointment for appointment in Appointment.all if appointment.client_id==self.id]
+    
+    def get_barbers(self):
+        appointments=self.get_appointments()
+        barber_ids=[appointment.barber_id for appointment in appointments]
+        barbers=[]
+        for barber_id in barber_ids:
+            barbers.append(Barber.get_barber_by_id(barber_id))
+        return list(set(barbers))
 
     @classmethod
     def get_client_by_id(cls,id):
@@ -83,6 +100,22 @@ class Appointment:
         self.all.append(self)
         self.id=len(Appointment.all)
 
+    @classmethod
+    def get_barbers_with_appointments(cls):
+        barber_ids=[appointment.barber_id for appointment in cls.all]
+        barbers=[]
+        for barber_id in barber_ids:
+            barbers.append(Barber.get_barber_by_id(barber_id))
+        return list(set(barbers))
+    
+    @classmethod
+    def get_clients_with_appointments(cls):
+        client_ids=[appointment.client_id for appointment in cls.all]
+        clients=[]
+        for client_id in client_ids:
+            clients.append(Client.get_client_by_id(client_id))
+        return list(set(clients))
+
     def __repr__(self):
         return f"<{type(self).__name__} id={self.id} client id={self.client_id} barber id={self.barber_id} date={self.date} cut style={self.cut_style} price={self.price}  />"
 
@@ -94,8 +127,9 @@ steve=Client("Steve","Smith","993-333-4343","smiths@gmail.com")
 
 bob.book_appointment(manuel,"07-25-2023","spike",20)
 bob.book_appointment(manuel,"07-30-2023","regular",7)
-steve.book_appointment(manuel,"07-30-2023","spike",20)
-print(manuel.get_clients_by_hair_cut("spike"))
+#steve.book_appointment(manuel,"07-30-2023","spike",20)
+
 print()
-print(manuel.get_appointments_by_date("07-30-2023"))
+print(Appointment.get_barbers_with_appointments())
+print(Appointment.get_clients_with_appointments())
 
