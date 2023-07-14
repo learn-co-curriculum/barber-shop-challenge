@@ -354,7 +354,7 @@ class Appointment:
         return self._client_id
     
     @client_id.setter
-    def id(self,client_id):
+    def client_id(self,client_id):
         if(type(client_id)!=int):
             raise ValueError("Client id must be an integer")
         self._client_id=client_id
