@@ -36,6 +36,56 @@ class Barber:
         self.id=id
         self.all.append(self)
 
+    @property
+    def id(self):
+        return self._id
+    
+    @id.setter
+    def id(self,id):
+        if(id!=None and type(id)!=int):
+            raise ValueError("Id must be an integer")
+        self._id=id
+    
+    @property
+    def fname(self):
+        return self._fname
+    
+    @fname.setter
+    def fname(self,fname):
+        if(type(fname)!=str):
+            raise ValueError("First name must be a string")
+        self._fname=fname
+
+    @property
+    def lname(self):
+        return self._lname
+    
+    @lname.setter
+    def lname(self,lname):
+        if(type(lname)!=str):
+            raise ValueError("Last name must be a string")
+        self._lname=lname
+
+    @property
+    def date_hired(self):
+        return self._date_hired
+    
+    @date_hired.setter
+    def date_hired(self,date_hired):
+        if(type(date_hired)!=str):
+            raise ValueError("Date hired must be a string")
+        self._date_hired=date_hired
+
+    @property
+    def phone(self):
+        return self._phone
+    
+    @phone.setter
+    def phone(self,phone):
+        if(type(phone)!=str):
+            raise ValueError("Phone must be a string")
+        self._phone=phone
+
     def save(self):
         Barber.create_table()
         query="""
@@ -147,6 +197,56 @@ class Client:
         self.id=id
         self.all.append(self)
 
+    @property
+    def id(self):
+        return self._id
+    
+    @id.setter
+    def id(self,id):
+        if(id!=None and type(id)!=int):
+            raise ValueError("Id must be an integer")
+        self._id=id
+
+    @property
+    def fname(self):
+        return self._fname
+    
+    @fname.setter
+    def fname(self,fname):
+        if(type(fname)!=str):
+            raise ValueError("First name must be a string")
+        self._fname=fname
+
+    @property
+    def lname(self):
+        return self._lname
+    
+    @lname.setter
+    def lname(self,lname):
+        if(type(lname)!=str):
+            raise ValueError("Last name must be a string")
+        self._lname=lname
+
+    @property
+    def phone(self):
+        return self._phone
+    
+    @phone.setter
+    def phone(self,phone):
+        if(type(phone)!=str):
+            raise ValueError("Phone must be a string")
+        self._phone=phone
+
+    @property
+    def email(self):
+        return self._email
+    
+    @email.setter
+    def email(self,email):
+        if(type(email)!=str):
+            raise ValueError("Email must be a string")
+        self._email=email
+
     def save(self):
         Client.create_table()
         query="""
@@ -239,6 +339,56 @@ class Appointment:
         self.id=id
         self.all.append(self)
 
+    @property
+    def id(self):
+        return self._id
+    
+    @id.setter
+    def id(self,id):
+        if(id!=None and type(id)!=int):
+            raise ValueError("Id must be an integer")
+        self._id=id
+
+    @property
+    def client_id(self):
+        return self._client_id
+    
+    @client_id.setter
+    def id(self,client_id):
+        if(type(client_id)!=int):
+            raise ValueError("Client id must be an integer")
+        self._client_id=client_id
+
+    @property
+    def barber_id(self):
+        return self._barber_id
+    
+    @barber_id.setter
+    def barber_id(self,barber_id):
+        if(type(barber_id)!=int):
+            raise ValueError("Barber id must be an integer")
+        self._barber_id=barber_id
+
+    @property
+    def date(self):
+        return self._date
+    
+    @date.setter
+    def date(self,date):
+        if(type(date)!=str):
+            raise ValueError("Date must be a string")
+        self._date=date
+
+    @property
+    def cut_style(self):
+        return self._cut_style
+    
+    @cut_style.setter
+    def cut_style(self,cut_style):
+        if(type(cut_style)!=str):
+            raise ValueError("Cut style must be a string")
+        self._cut_style=cut_style
+
     @classmethod
     def get_barbers_with_appointments(cls):
         query="""
@@ -278,13 +428,13 @@ class Appointment:
 Barber.drop_table()
 manuel=Barber("Manuel","Garcia","07-12-2023","779-343-3434")
 manuel.save()
-mike=Barber("Mike","Garcia","07-12-2023","779-343-3434")
+mike=Barber("Manuel","Garcia","07-12-2023","779-343-3434")
 mike.save()
 
 Client.drop_table()
 bob=Client("Bob","Miller","343-343-3434","millerb@gmail.com")
 bob.save()
-steve=Client("Steve","Smith","993-333-4343","smiths@gmail.com")
+steve=Client("Steve","Wonder","993-333-4343","smiths@gmail.com")
 steve.save()
 
 Appointment.drop_table()
